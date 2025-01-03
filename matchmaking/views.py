@@ -16,6 +16,15 @@ class TeamDetailView(APIView):
         except Team.DoesNotExist:
             return Response({"detail": "Team not found."}, status=status.HTTP_404_NOT_FOUND)
 
+class TeamListView(APIView):
+    def get(self, request):
+        try:
+            team = Team.objects.all()
+            serializer = TeamSerializer(team, many=True)
+            return Response(serializer.data)
+        except Team.DoesNotExist:
+            return Response({"detail": "Team not found."}, status=status.HTTP_404_NOT_FOUND)
+
 # Thách đấu đội khác
 class TeamChallengeAPIView(APIView):
     def post(self, request, id):
@@ -105,7 +114,20 @@ class InvitePlayerAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Team.DoesNotExist:
             return Response({"detail": "Team not found."}, status=status.HTTP_404_NOT_FOUND)
-        
+
+# Chấp nhận lời mời người chơi
+class AcceptPlayerInviteAPIView(APIView):
+    def post(self, request, invite_id):
+        try:
+            invite = PlayerInvite.objects.get(id=invite_id)
+            player = invite.player
+            team = invite.team
+            player.team = team
+            player.save()
+            invite.delete()
+            return Response({"detail": "Player invite accepted."}, status=status.HTTP_200_OK)
+        except PlayerInvite.DoesNotExist:
+            return Response({"detail": "Invite not found."}, status=status.HTTP_404_NOT_FOUND)     
 
 # Yêu cầu tham gia đội
 class RequestJoinTeamAPIView(APIView):
@@ -134,20 +156,6 @@ class RequestJoinTeamAPIView(APIView):
             return Response({"error": "Team not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
-# Chấp nhận lời mời người chơi
-class AcceptPlayerInviteAPIView(APIView):
-    def post(self, request, invite_id):
-        try:
-            invite = PlayerInvite.objects.get(id=invite_id)
-            player = invite.player
-            team = invite.team
-            player.team = team
-            player.save()
-            invite.delete()
-            return Response({"detail": "Player invite accepted."}, status=status.HTTP_200_OK)
-        except PlayerInvite.DoesNotExist:
-            return Response({"detail": "Invite not found."}, status=status.HTTP_404_NOT_FOUND)
-
 # Chấp nhận yêu cầu tham gia đội
 class AcceptTeamRequestAPIView(APIView):
     def post(self, request, request_id):
@@ -171,9 +179,6 @@ class AcceptTeamRequestAPIView(APIView):
             return Response({"detail": "Team request accepted."}, status=status.HTTP_200_OK)
         except TeamRequest.DoesNotExist:
             return Response({"error": "Request not found."}, status=status.HTTP_404_NOT_FOUND)
-
-
-
 
 # Tạo trận đấu mới
 class CreateMatchAPIView(APIView):

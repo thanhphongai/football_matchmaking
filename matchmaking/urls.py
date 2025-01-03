@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import AcceptPlayerInviteAPIView, AcceptTeamRequestAPIView, CreateMatchAPIView, CreatePlayerAPIView, CreateTeamAPIView, InvitePlayerAPIView, MatchDetailAPIView, MatchScorePropositionAPIView, RequestJoinTeamAPIView, TeamChallengeAPIView, TeamDetailView
+from .views import AcceptPlayerInviteAPIView, AcceptTeamRequestAPIView, CreateMatchAPIView, CreatePlayerAPIView, CreateTeamAPIView, InvitePlayerAPIView, MatchDetailAPIView, MatchScorePropositionAPIView, RequestJoinTeamAPIView, TeamChallengeAPIView, TeamDetailView, TeamListView
 
 urlpatterns = [
     path('api/teams/<int:id>/', TeamDetailView.as_view(), name='team_detail'),
+    path('api/teams/', TeamListView.as_view(), name='team_detail'),
     path('api/teams/<int:id>/challenge/', TeamChallengeAPIView.as_view(), name='team_challenge'),
     path('api/matches/<int:id>/', MatchDetailAPIView.as_view(), name='match_detail'),
     path('api/matches/<int:id>/score-proposition/', MatchScorePropositionAPIView.as_view(), name='match_score_proposition'),
